@@ -3,6 +3,7 @@ package com.sun.sort;
 import java.util.Arrays;
 
 /**
+ * 快速排序
  * Created by Chris on 2016/7/12.
  */
 public class QucikSort {
