@@ -1,7 +1,7 @@
 package com.nowcoder.exercise;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Chris on 2016/8/13.
@@ -27,12 +27,7 @@ class MyThread extends Thread {
 }
 public class MultiThreadTest {
     private static Object object = new Object();
-    public static void main(String[] args) {
-//        testThread();
-//        testSynchronized();
-//        testBlockingQueue();
-        testThreadLocal();
-    }
+
     public static void testSynchronized1(){
         synchronized (object) {
             try {
@@ -133,6 +128,117 @@ public class MultiThreadTest {
                 }
             }).start();
         }
+    }
+    public static void testExecutor(){
+//        ExecutorService service = Executors.newSingleThreadExecutor();
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 5; ++i){
+                    try {
+                        Thread.sleep(1000);
+                        System.out.println("Executor1:" + i);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 5; ++i){
+                    try {
+                        Thread.sleep(1000);
+                        System.out.println("Executor2:" + i);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        service.shutdown();
+//        System.out.println(service.isShutdown());//true
+        while (!service.isTerminated()) {
+            try {
+                Thread.sleep(1000);
+                System.out.println("Wait for termination!");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static int counter = 0;//volatile
+    private static AtomicInteger atomciCounter = new AtomicInteger(0);
+
+    public static void testWithoutAtomic() {
+        for (int i = 0; i < 10; ++i) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                        for (int j = 0; j < 10; ++j){
+                            counter++;
+                            System.out.println(counter);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+    }
+    public static void testWithAtomic() {
+        for (int i = 0; i < 10; ++i) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                        for (int j = 0; j < 10; ++j){
+                            System.out.println(atomciCounter.incrementAndGet());
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+    }
+    public static void testAtomic() {
+//        testWithoutAtomic();
+        testWithAtomic();
+    }
+    public static void testFuture() {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        Future<Integer> future = service.submit(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                Thread.sleep(3000);
+                return 1;
+            }
+        });
+        service.shutdown();
+
+        try {
+            System.out.println(future.get());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    public static void main(String[] args) {
+//        testThread();
+//        testSynchronized();
+//        testBlockingQueue();
+//        testThreadLocal();
+//        testExecutor();
+//        testAtomic();
+        testFuture();
     }
 }
 class Producer implements Runnable {
