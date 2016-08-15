@@ -234,23 +234,25 @@ public class MultiThreadTest {
     public static void testJoin() {
         TestJoinThread t = new TestJoinThread();
         Thread thread = new Thread(t, "sub thread");
+        thread.setPriority(10);
         thread.start();
-        try {
+        /*try {
             thread.join();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
     public static void main(String[] args) {
 //        testThread();
 //        testSynchronized();
 //        testBlockingQueue();
 //        testThreadLocal();
-//        testExecutor();
+        testExecutor();
 //        testAtomic();
 //        testFuture();
-        testJoin();
-        System.out.println(Thread.currentThread().getName() + " hello world");
+//        testJoin();
+//        Thread.yield();
+//        System.out.println(Thread.currentThread().getName() + " hello world");
     }
 }
 class Producer implements Runnable {
@@ -291,6 +293,11 @@ class TestJoinThread implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("sub thread hello world");
+        /*try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        System.out.println(Thread.currentThread().getName() + " hello world");
     }
 }
